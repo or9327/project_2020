@@ -1,5 +1,8 @@
 package com.example.chorong.springboot.web;
 
+import com.example.chorong.springboot.config.auth.LoginUser;
+import com.example.chorong.springboot.config.auth.dto.SessionUser;
+import com.example.chorong.springboot.domain.user.User;
 import com.example.chorong.springboot.service.posts.PostsService;
 import com.example.chorong.springboot.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -8,15 +11,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.servlet.http.HttpSession;
+
 @RequiredArgsConstructor
 @Controller
 public class IndexController {
 
     private final PostsService postsService;
+    private final HttpSession httpSession;
 
     @GetMapping("/")
-    public String index(Model model){ //Model: 서버 켐플릿 엔진에서 사용할 수 있는 객체를 저장할 수 있음. 여기서는 postsService.findAllDesc() 로 가져온 결과를 index.mustache로 전달
+    public String index(Model model, @LoginUser SessionUser user){ //Model: 서버 켐플릿 엔진에서 사용할 수 있는 객체를 저장할 수 있음. 여기서는 postsService.findAllDesc() 로 가져온 결과를 index.mustache로 전달
         model.addAttribute("posts", postsService.findAllDesc());
+
+        if(user != null){
+            model.addAttribute("userName", user.getName());
+        }
         return "index";
     }
 
